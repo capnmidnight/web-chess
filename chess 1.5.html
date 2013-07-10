@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <style>
+.board{
+	/*border:solid 1px black;*/
+	padding: 0;
+}
+.row {
+	clear: left;
+	float: left; 
+	width: 160px; 
+	height: 20px
+}
+.block {
+	float: left;
+	width: 20px;
+	height: 20px
+}
+.dark {
+	background-color: #555555
+}
+.light {
+	background-color: #ababab
+}
+td{
+	vertical-align:top;
+}
+    </style>
+
+    <script language="javascript">
+var pieceLocs = new Array(64);
+var listOut = "<a href='chess.html'>clear</a><br/>";
+var blackCap = "";
+var whiteCap = "";
+var cols = "ABCDEFGH";
+function fillPieces()
+{
+	var turn = "white";
+	for(var x=0;x<8;++x){
+		pieceLocs[i(x, 1)] = 'bp';
+		pieceLocs[i(x, 6)] = 'wp';
+		for(var y=2;y<6;y++){
+			pieceLocs[i(x,y)] = 'xx';
+		}
+	}
+	pieceLocs[0] = pieceLocs[7] = 'br';
+	pieceLocs[1] = pieceLocs[6] = 'bn';
+	pieceLocs[2] = pieceLocs[5] = 'bb';
+	pieceLocs[3] = 'bk';
+	pieceLocs[4] = 'bq';
+	pieceLocs[56] = pieceLocs[63] = 'wr';
+	pieceLocs[57] = pieceLocs[62] = 'wn';
+	pieceLocs[58] = pieceLocs[61] = 'wb';
+	pieceLocs[59] = 'wk';
+	pieceLocs[60] = 'wq';
+	var str = document.location.toString();
+	if(str.indexOf('?') > 0)
+	{
+		var moveList = str.substr(str.indexOf('?')+1);
+		if((moveList.length / 4) % 2 == 0)
+		{
+			turn = "white";
+		}
+		else
+		{
+			turn = "black";
+		}
+		for(var n = 0; n < moveList.length; n+=4)
+		{
+			var x1 = moveList.charAt(n);
+			var y1 = moveList.charAt(n+1);
+			var x2 = moveList.charAt(n+2);
+			var y2 = moveList.charAt(n+3);
+			var cap = move(x1*1, y1*1, x2*1, y2*1);
+			listOut += "<a href='chess.html?"+moveList.substr(0, n+4)+"'>"+(Math.floor(n/8)+1)+((n/4)%2==0?'a':'b');
+			listOut += ": "+cols.charAt(x2)+(8-y2)+" -> "+cols.charAt(x1)+(8-y1)+"</a>";
+			if(cap.length > 0)
+			{
+				listOut += cap;
+			}
+			listOut += "<br/>";
+		}
+	}
+	return turn;
+}
+function move(_x1, _y1, _x2, _y2)
+{
+	var q = i(_x1, _y1);
+	var p = i(_x2, _y2);
+	var cap = "";
+	if(pieceLocs[q] != 'xx')
+	{
+		cap = "<img src='"+pieceLocs[q]+".gif'/>"
+		if(pieceLocs[q].charAt(0) == 'b')
+		{
+			blackCap += cap;
+		}
+		else
+		{
+			whiteCap += cap;
+		}
+	}
+	pieceLocs[q] = pieceLocs[p];
+	pieceLocs[p] = 'xx';
+	return cap;
+}
+function makeBoard()
+{
+	var turn = fillPieces();
+	document.write("<table border='1'><tr><td>");
+	for(var y = 0; y < 8; ++y)
+	{
+		document.write("<div class='row'>");
+		for(var x = 0; x < 8; ++x)
+		{
+			document.write("<div class='block ");
+			if((x+y)%2 == 1) document.write("dark");
+			else document.write("light");
+			document.write("' onclick='f("+x+","+y+");' style='background-image:url("+pieceLocs[i(x,y)]+".gif);'></div>");
+		}
+		document.write("</div>");
+	}
+	document.write("</td>");
+	document.write("<td class='light' rowspan='2'>It is "+turn+"'s turn.<br/>"+listOut+"</td>");
+	document.write("<td class='light' rowspan='2'>capture:<br/>"+blackCap+"<br/>"+whiteCap+"</td></tr>");
+	document.write("<tr><td>jschess 1.5, © Sean T. McBeth, 2003 - 2008</td></tr></table>");
+}
+try{
+makeBoard();
+}
+catch(exp){alert(exp.description);}
+var c = 0, fx, fy;
+function f(x, y)
+{
+	if(c == 0)
+	{
+		fx = x; fy = y; c = 1;
+	}
+	else
+	{
+		g(x, y, fx, fy);
+		c = 0;
+	}
+}
+function g(x1, y1, x2, y2)
+{
+	var s = '?';
+	if(document.location.toString().indexOf('?') >= 0){ s='';}
+	s = s + "" + x1 + "" + y1 + "" + x2 + "" + y2;
+	document.location = document.location + s;
+}
+function i(x, y){return (y*8+x);}
+    </script>
+
+</head>
+<body>
+</body>
+</html>
